@@ -1,0 +1,12 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: db-np
+spec:
+  selector:
+    app: db
+  type: NodePort
+  ports:
+    - port: 8080
+      #destination port
+      targetPort: 3306

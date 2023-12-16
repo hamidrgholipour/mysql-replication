@@ -1,0 +1,58 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: db
+  annotations:
+    kubernetes.io/change-cause: ver1
+spec:
+  revisionHistoryLimit: 3
+  selector:
+    matchLabels:
+      app: db
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: db
+    spec:
+      containers:
+        - name: db
+          image: mysql
+          ports:
+            - containerPort: 3306
+          volumeMounts:
+            - mountPath: /var/lib/mysql
+              name: db-data
+          env:
+            - name: MYSQL_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: db-secret
+                  key: password
+          resources:
+            limits:
+              cpu: 500m
+              memory: 500Mi
+            requests:
+              cpu: 100m
+              memory: 100Mi                    
+      volumes:
+      - name: db-data
+        persistentVolumeClaim:
+          claimName: pvc-local
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: db
+  labels:
+    app: dp
+spec:
+  selector:
+    app: db
+  type: ClusterIP
+  ports:
+  - name: msql-port
+    port: 3306
+    targetPort: 3306
+

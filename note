@@ -1,0 +1,1 @@
+for i in {11..100}; do ./insert-query.sh  "test$i"; done &>/dev/null
